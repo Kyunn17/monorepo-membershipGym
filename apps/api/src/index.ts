@@ -1,69 +1,24 @@
+import { config } from "dotenv";
+config({
+  path: "../../.env",
+});
 import { Hono } from "hono";
-import { db, users } from "@repo/db";
 import { cors } from "hono/cors";
-import { eq } from 'drizzle-orm'
+import user from "./routes/users";
+import "dotenv/config";
 
 const app = new Hono();
-app.use("/*", cors())
+
+app.use("/*", cors());
 
 app.get("/", (c) => {
   return c.json({
-    message: "Hello from Hono",
+    message: "API is running",
   });
 });
 
-app.get("/users", async (c) => {
-  const result = await db.select().from(users);
+app.route("/users", user);
 
-  return c.json(result);
-});
-
-app.post("/users", async (c) => {
-  const data = await c.req.json();
-
-  if (!data.username || !data.membership) {
-    return c.json({
-      pesan: "Username dan membership wajib diisi"
-    }, 400);
-  }
-
-  await db.insert(users).values({
-    username: data.username,
-    membership: data.membership,
-  });
-
-  return c.json({
-    pesan: "Berhasil menambahkan user",
-  }, 201);
-});
-
-app.get("users/:id", async(c) =>{
-    const idUser = Number(c.req.param('id'))
-    const data = await db.select().from(users).where(eq(users.id, idUser))
-    
-    // Kalau datanya nggak ketemu, kasih tau biar server gak crash
-    if (!data.length) {
-        return c.json({ username: "", membership : "" }, 404) 
-    }
-    
-    return c.json(data[0])
-})
-
-app.put("users/:id", async(c) =>{
-    const idUser = Number(c.req.param('id'))
-    const data = await c.req.json()
-    const setUpdate = await db.update(users).set({username:data.username, membership: data.membership}).where(eq(users.id, idUser))
-    
-    return c.json({pesan : `Kelas dengan ID ${setUpdate} berhasil di-update`})
-})
-
-app.delete("users/:id", async(c) =>{
-    const idUser = Number(c.req.param('id'))
-    const data = await db.delete(users).where(eq(users.id, idUser))
-
-    return c.json({pesan: `Siswa dengan ID ${data} berhasil dihapus`})
-    
-})
 export default {
   port: 3001,
   fetch: app.fetch,

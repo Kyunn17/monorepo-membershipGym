@@ -5,7 +5,9 @@
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
+    "@better-auth/drizzle-adapter": "^1.7.7",
     "@repo/db": "workspace:*",
+    "better-auth": "^1.7.7",
     "dotenv": "^18.0.6",
     "drizzle-orm": "^0.45.3",
     "hono": "^4.13.13",
