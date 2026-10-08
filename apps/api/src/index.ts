@@ -61,6 +61,7 @@ app.delete("users/:id", async(c) =>{
     const idUser = Number(c.req.param('id'))
     const data = await db.delete(users).where(eq(users.id, idUser))
 
+    return c.json({pesan: `Siswa dengan ID ${data} berhasil dihapus`})
     
 })
 export default {
