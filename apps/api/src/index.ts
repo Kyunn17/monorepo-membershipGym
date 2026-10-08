@@ -18,15 +18,24 @@ app.get("/users", async (c) => {
   return c.json(result);
 });
 
-app.post("/users", async (c)=>{
-    const data = await c.req.json()
-    
-    await db.insert(users).values({
-        username: data.username,
-        membership : data.membership,
-    })
-    return c.json({pesan : `berhasil nambah ${data}`})
-})
+app.post("/users", async (c) => {
+  const data = await c.req.json();
+
+  if (!data.username || !data.membership) {
+    return c.json({
+      pesan: "Username dan membership wajib diisi"
+    }, 400);
+  }
+
+  await db.insert(users).values({
+    username: data.username,
+    membership: data.membership,
+  });
+
+  return c.json({
+    pesan: "Berhasil menambahkan user",
+  }, 201);
+});
 
 app.get("users/:id", async(c) =>{
     const idUser = Number(c.req.param('id'))
