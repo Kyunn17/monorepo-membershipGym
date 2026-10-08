@@ -54,4 +54,7 @@ app.delete("users/:id", async(c) =>{
 
     
 })
-export default app;
+export default {
+  port: 3001,
+  fetch: app.fetch,
+}
