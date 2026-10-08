@@ -5,6 +5,8 @@ config({
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import user from "./routes/users";
+import  pack  from "./routes/package";
+import memberships from "./routes/membership";
 import "dotenv/config";
 
 const app = new Hono();
@@ -18,6 +20,8 @@ app.get("/", (c) => {
 });
 
 app.route("/users", user);
+app.route("/pack", pack)
+app.route("/memberships", memberships)
 
 export default {
   port: 3001,
