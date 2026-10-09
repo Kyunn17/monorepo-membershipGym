@@ -34,6 +34,7 @@
       "name": "@repo/web",
       "version": "0.1.0",
       "dependencies": {
+        "better-auth": "^1.7.7",
         "next": "16.4.0",
         "react": "19.3.0",
         "react-dom": "19.3.0",
