@@ -7,6 +7,7 @@ import { cors } from "hono/cors";
 import user from "./routes/users";
 import  pack  from "./routes/package";
 import memberships from "./routes/membership";
+import userAuth from "./routes/user";
 import { auth } from "./auth";
 import "dotenv/config";
 
@@ -33,6 +34,7 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => {
 app.route("/users", user);
 app.route("/pack", pack)
 app.route("/memberships", memberships)
+app.route("/userAuth", userAuth)
 
 export default {
   port: 3001,

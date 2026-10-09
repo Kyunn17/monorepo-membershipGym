@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 // Pastiin import tabelnya bener namanya "membership"
-import { db, membership, packages } from "@repo/db"; 
+import { db, membership, packages ,user } from "@repo/db"; 
 import { eq } from "drizzle-orm";
 
 const memberships = new Hono();
@@ -10,31 +10,33 @@ memberships.get("/", async (c) => {
   const result = await db
   .select()
   .from(membership)
-  .leftJoin(packages, eq(membership.packageId, packages.id));
+  .leftJoin(packages, eq(membership.packageId, packages.id))
+  .leftJoin(user, eq(membership.userId, user.id))
   return c.json(result);
 });
 
 // CREATE (POST)
+// CREATE (POST)
 memberships.post("/", async (c) => {
   const data = await c.req.json();
+  
+  // 1. KITA CEK APA YANG DIKIRIM FRONTEND DI TERMINAL!
+  console.log("Data masuk dari frontend:", data);
 
-  // Validasi: Cek 5 kolom wajib diisi
-  if (!data.userId || !data.packageId || !data.active || !data.startDate || !data.endDate) {
-    return c.json(
-      {
-        pesan: "userId, packageId, active, startDate, dan endDate wajib diisi",
-      },
-      400
-    );
-  }
+  // 2. Validasi satu-satu biar ketahuan yang error yang mana
+  if (!data.userId) return c.json({ pesan: "userId kosong nih!" }, 400);
+  if (!data.packageId) return c.json({ pesan: "packageId kosong atau bukan angka!" }, 400);
+  if (!data.status) return c.json({ pesan: "status masih kosong!" }, 400);
+  if (!data.startDate) return c.json({ pesan: "startDate belum diisi!" }, 400);
+  if (!data.endDate) return c.json({ pesan: "endDate belum diisi!" }, 400);
 
-  // Insert ke tabel membership
+  // Kalo lolos semua, baru masukin ke database
   await db.insert(membership).values({
-    userId: data.userId,          // Text (karena tabel user asli belum ada)
-    packageId: data.packageId,    // Number (Foreign key ke packages)
-    status: data.status,          // Enum: "active" | "expired" | "cancelled"
-    startDate: data.startDate, // Convert string ke format Date
-    endDate: data.endDate,     // Convert string ke format Date
+    userId: data.userId,          
+    packageId: data.packageId,    
+    status: data.status,          
+    startDate: data.startDate, 
+    endDate: data.endDate,     
   });
 
   return c.json(
@@ -53,7 +55,8 @@ memberships.get("/:id", async (c) => {
     .select()
     .from(membership)
     .where(eq(membership.id, idMembership))
-    .leftJoin(packages, eq(membership.packageId, packages.id));
+    .leftJoin(packages, eq(membership.packageId, packages.id))
+    .leftJoin(user, eq(membership.userId, user.id))
 
   if (!data.length) {
     return c.json(
